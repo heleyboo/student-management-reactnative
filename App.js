@@ -10,10 +10,15 @@ import HomeScreen from './app/HomeScreen';
 import Details from './app/Details';
 
 const instructions = Platform.select({
-  ios: 'Hello A-0810',
+  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android:
     'Double tap R on your keyboard to reload,\n' +
     'Shake or press menu button for dev menu',
+});
+
+const platform = Platform.select({
+  ios: 'iOS',
+  android: 'Android'
 });
 
 type Props = {};
@@ -30,9 +35,14 @@ const RootStack = createStackNavigator({
 
 export default class App extends Component<Props> {
   render() {
-    return <RootStack />;
+    return (
+      <View style={styles.container}>
+        <Text style={styles.welcome}>Hello {platform}!</Text>
+      </View>
+    );
   }
 }
+
 
 const styles = StyleSheet.create({
   container: {
