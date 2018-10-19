@@ -15,8 +15,8 @@ class MemberInfo extends Component {
     render() {
         return (
             <View style={[styles.container, this.props.style]} >
-                {/* {this._handleData(this.state.memberInfo)} */}
-                <Text style={styles.text} >{this.props.memberInfo}</Text>
+                <Text style={styles.title} >Member's Info</Text>
+                <Text style={styles.text} >- {this.props.memberInfo}</Text>
             </View>
         );
     }
@@ -34,10 +34,17 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         flexDirection: 'column',
         paddingLeft: 8,
-        backgroundColor: 'yellow'
     },
     text: {
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    title: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: 5,
+        fontWeight: 'bold',
+        fontSize: 16,
     }
 });

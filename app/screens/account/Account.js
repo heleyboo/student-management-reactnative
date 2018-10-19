@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, TouchableOpacity, TextInput, View } from 'react-native';
 import { Container, Header, Content, Text, Left, Button, Body, Title, Icon, Right } from 'native-base';
 import realm from '@realm/realm';
 import ProgressDialog from '@components/ProgressDialog'
@@ -13,25 +13,12 @@ export class Account extends Component {
         super(props);
         this.state = {
             isProgress: false,
-            status: 'Account Screen',
+            status: 'Members Screen',
             currentMemberId: 0,
-            currentMember: 'John Doe',
-            curRealm: undefined,
+            currentMember: null,
+            curRealm: realm.objects('Members'),
         }
     }
-
-    // componentWillMount() {
-    //     realm.write(()=> {
-    //         let unknow = realm.create('Developer', {
-    //             id: 0,
-    //             name: 'John Doe',
-    //             skill: 'Ăn hại',
-    //             location: 'HCMC',
-    //             yearOfBirth: 2005,
-    //         })
-    //         this.setState({currentMember: unknow})
-    //     })
-    // }
 
     _setProgressbar = (open) => {
         this.setState({ isProgress: open })
@@ -48,7 +35,7 @@ export class Account extends Component {
         }).then((response) => response.json())
             .then((responseJson) => {
                 console.log(responseJson.members);
-                this.setState({ status: 'get data success' })
+                this.setState({ status: 'Get data success!' })
                 realm.write(() => {
                     let allMembers = realm.create('Members', { members: [] });
                     for (let m of responseJson.members) {
@@ -66,18 +53,22 @@ export class Account extends Component {
             .catch((error) => {
                 console.error(error);
                 this._setProgressbar(false);
-                this.setState({ status: 'get data fail' })
+                this.setState({ status: 'Get data fail!!!' })
             });
     };
 
     _updateCurrentMember() {
         let id = this.state.currentMemberId
         let listMem = this.state.curRealm
-        if (!listMem || !listMem.members || id == '' || id > listMem.members.length) {
-            this.setState({ currentMember: 'Not found' })
+        if (!listMem || !listMem.members || id == '') {
+            this.setState({ currentMember: 'Not found any record, please get data first' })
         } else {
-            let curMem = listMem.members[id].name
-            this.setState({ currentMember: curMem })
+            if (id >= listMem.members.length) {
+                this.setState({ currentMember: ('Not found, current have only ' + listMem.members.length + ' records (include id = 0)') })
+            } else {
+                let curMem = listMem.members[id].name
+                this.setState({ currentMember: curMem })
+            }
         }
 
     }
@@ -104,8 +95,9 @@ export class Account extends Component {
                         <Text style={styles.txtButton} >Get data</Text>
                         <ProgressDialog visible={this.state.isProgress} />
                     </TouchableOpacity>
-                    <Text style={{ flex: 1, backgroundColor: 'green', marginTop: 5, justifyContent: 'center' }}>{this.state.status}</Text>
-                    <TextInput style={{ borderColor: 'black', borderRadius: 1 }}
+                    <Text style={styles.txtStatus}>{this.state.status}</Text>
+                    <Text style={styles.txtTitle} >Input id to field below</Text>
+                    <TextInput style={styles.textInput}
                         value={this.state.currentMemberId}
                         editable={true} maxLength={3} keyboardType='number-pad'
                         onChangeText={(num) => this.setState({ currentMemberId: num })} />
@@ -113,7 +105,7 @@ export class Account extends Component {
                         onPress={() => this._updateCurrentMember()}>
                         <Text style={styles.txtButton} >Show member</Text>
                     </TouchableOpacity>
-                    <MemberInfo memberInfo={this.state.currentMember} />
+                    <MemberInfo memberInfo={this.state.currentMember} style={styles.memberInfo} />
                 </Content>
             </Container>
         );
@@ -137,5 +129,32 @@ const styles = StyleSheet.create({
     txtButton: {
         color: 'white',
         fontWeight: 'bold',
+        alignSelf: 'center',
+    },
+    txtTitle: {
+        color: 'black',
+        fontWeight: 'bold',
+        alignSelf: 'center',
+    },
+    txtStatus: {
+        backgroundColor: '#00ffffff',
+        marginTop: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        padding: 5,
+        borderRadius: 5
+    },
+    textInput: {
+        borderColor: 'black',
+        borderRadius: 1,
+        backgroundColor: 'gray',
+        marginHorizontal: 5,
+        borderRadius: 5
+    },
+    memberInfo: {
+        marginTop: 5,
+        width: '90%',
+        alignSelf: 'center'
     }
 });
